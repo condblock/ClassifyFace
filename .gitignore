@@ -1,4 +1,4 @@
-model.pth
 *.jpg
 *.jpeg
 *.png
+*.pth
