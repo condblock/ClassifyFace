@@ -60,37 +60,35 @@ class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
         self.conv_layers = nn.Sequential(
-            nn.Conv2d(3, 32, kernel_size=3, padding=1),     # RGB로 분리
-            nn.ReLU(),                                      # 활성화
-            nn.MaxPool2d(kernel_size=2, stride=2),          # 풀링
+            nn.Conv2d(3, 32, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
 
-            nn.Conv2d(32, 64, kernel_size=3, padding=1),    # 컨볼루션
-            nn.ReLU(),                                      # 활성화
-            nn.Conv2d(64, 128, kernel_size=3, padding=1),   # 컨볼루션
-            nn.ReLU(),                                      # 활성화
-            nn.MaxPool2d(kernel_size=2, stride=2),          # 풀링
-            
-            nn.Conv2d(128, 256, kernel_size=3, padding=1),  # 컨볼루션
-            nn.ReLU(),                                      # 활성화
-            nn.Conv2d(256, 512, kernel_size=3, padding=1),  # 컨볼루션
-            nn.ReLU(),                                      # 활성화
-            nn.MaxPool2d(kernel_size=2, stride=2),          # 풀링
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(128, 256, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
 
-            nn.Conv2d(512, 1024, kernel_size=3, padding=1), # 컨볼루션
-            nn.ReLU(),                                      # 활성화
-            nn.Conv2d(1024, 2048, kernel_size=3, padding=1),# 컨볼루션
-            nn.ReLU(),                                      # 활성화
-            nn.MaxPool2d(kernel_size=2, stride=2),          # 풀링
+            nn.Conv2d(256, 512, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(512, 1024, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
         )
         self.fc_layers = nn.Sequential(
-            nn.Linear(2048 * 8 * 8, 2048),
+            nn.Linear(1024 * 16 * 16, 1024),
             nn.ReLU(),
-            nn.Linear(2048, 5)
+            nn.Linear(1024, 512),
+            nn.ReLU(),
+            nn.Linear(512, 5)
         )
 
     def forward(self, x):
         x = self.conv_layers(x)
-        x = x.view(-1, 2048 * 8 * 8)
+        x = x.view(-1, 1024 * 16 * 16)
         x = self.fc_layers(x)
         return x
 
@@ -101,7 +99,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.AdamW(model.parameters(), lr=0.001)
 
 # 학습 함수
-def train_model(model, data_loader, criterion, optimizer, num_epochs=30):
+def train_model(model, data_loader, criterion, optimizer, num_epochs=50):
     for epoch in range(num_epochs):
         with tqdm(data_loader, unit="batch") as tepoch:
             for inputs, labels in tepoch:
